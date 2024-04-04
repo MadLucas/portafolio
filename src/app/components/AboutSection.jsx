@@ -1,8 +1,7 @@
-"use client";
-import React, { useTransition, useState}from 'react'
-import Image from 'next/image'
-import TabButton from './TabButton'
-
+'use client'
+import React, { useState, useTransition } from 'react';
+import Image from 'next/image';
+import TabButton from './TabButton';
 
 const TAB_DATA = [
     {
@@ -27,31 +26,27 @@ const TAB_DATA = [
         title: "educacion",
         id: "educacion",
         content: (
-            <ul>
-                <li>Universidad Del Desarrolo Fullstack Web developer</li>
-            </ul>
+            <p>Aqui van tus certificados</p>
         )
     },
     {
-        title: "certificados",
-        id: "certificados",
+        title: "experiencia",
+        id: "experiencia",
         content: (
-            <ul>
-                <li>Aqui van los certificados</li>
-            </ul>
+            <p>Aqui va tu experiencia</p>
         )
     }
-]
+];
 
 const AboutSection = () => {
     const [tab, setTab] = useState("skills");
-    const [startTransition, isPending] = useTransition();
+    const [isPending, startTransition] = useTransition();
 
     const handleTabChange = (id) => {
-        startTransition (() =>{
+        startTransition(() => {
             setTab(id);
         });
-    }
+    };
 
     return (
         <section className='text-white'>
@@ -61,38 +56,40 @@ const AboutSection = () => {
                     src="/images/pcsetup.png"
                     alt="hero image"
                     width={400}
-                    height={400} />
+                    height={400}
+                />
                 <div>
-                    <h2 className='text-4xl font-bold text-white mb-4'>Acerca de mi</h2>
+                    <h2 className='text-4xl font-bold text-white mb-4'>Acerca de mí</h2>
                     <p className='text-base md:text-lg'>
                         Soy un desarrollador fullstack apasionado por crear aplicaciones interactivas y responsivas. Mi experiencia abarca Javascript, React, MongoDB, HTML, CSS, Next.js, Node.js, Express y Git. Mi capacidad de aprendizaje rápido me impulsa a expandir continuamente mi conocimiento y conjunto de habilidades. Disfruto trabajando en equipo y enfocándome en el desarrollo de aplicaciones web con altos estándares de calidad y las mejores prácticas de la industria.
                     </p>
-                    <div className='flex flex-row mt-8'>
-                        <TabButton
-                            selectTab={() => handleTabChange("skills")}
-                            active={tab === "skills"}>
-                            {""}
-                            Skills{""}
-                        </TabButton>
-                        <TabButton
-                            selectTab={() => handleTabChange("Educacion")}
-                            active={tab === "educacion"}>
-                            {""}
-                            educacion{""}
-                        </TabButton>
-                        <TabButton
-                            selectTab={() => handleTabChange("Experiencia")}
-                            active={tab === "Experiencia"}>
-                            {""}
-                            Experiencia{""}
-                        </TabButton>
-
+                    <div className='mt-8'>
+                        <div className='flex flex-row'>
+                            <TabButton
+                                selectTab={() => handleTabChange("skills")}
+                                active={tab === "skills"}
+                            >
+                                Skills
+                            </TabButton>
+                            <TabButton
+                                selectTab={() => handleTabChange("educacion")}
+                                active={tab === "educacion"}
+                            >
+                                Educacion
+                            </TabButton>
+                            <TabButton
+                                selectTab={() => handleTabChange("experiencia")}
+                                active={tab === "experiencia"}
+                            >
+                                Experiencia
+                            </TabButton>
+                        </div>
+                        <div className='mt-8'>{TAB_DATA.find((t) => t.id === tab).content}</div>
                     </div>
-                    <div className='mt-8 '>{TAB_DATA.find((t) => t.id === tab).content}</div>
                 </div>
             </div>
         </section>
-    )
-}
+    );
+};
 
 export default AboutSection;
