@@ -26,14 +26,9 @@ const TAB_DATA = [
         title: "educacion",
         id: "educacion",
         content: (
-            <p>Aqui van tus certificados</p>
-        )
-    },
-    {
-        title: "experiencia",
-        id: "experiencia",
-        content: (
-            <p>Aqui va tu experiencia</p>
+            <ul>
+                <li>Universidad Del Desarrollo</li>
+            </ul>
         )
     }
 ];
@@ -51,14 +46,18 @@ const AboutSection = () => {
     return (
         <section className='text-white'>
             <div className='md:grid md:grid-cols-2 gap-8 items-center py-8 px-4 xl:gap-16 sm:py-16 sm:px-16'>
+                <div className='mb-5'>
                 <Image
-                    className='rounded-full'
+                    className='rounded'
                     src="/images/pcsetup.png"
                     alt="hero image"
-                    width={400}
-                    height={400}
+                    width={500}
+                    height={500}
                 />
-                <div>
+                </div>
+
+                
+                <div className='mt-4 md:mt-0 text-left flex flex-col h-full'>
                     <h2 className='text-4xl font-bold text-white mb-4'>Acerca de mí</h2>
                     <p className='text-base md:text-lg'>
                         Soy un desarrollador fullstack apasionado por crear aplicaciones interactivas y responsivas. Mi experiencia abarca Javascript, React, MongoDB, HTML, CSS, Next.js, Node.js, Express y Git. Mi capacidad de aprendizaje rápido me impulsa a expandir continuamente mi conocimiento y conjunto de habilidades. Disfruto trabajando en equipo y enfocándome en el desarrollo de aplicaciones web con altos estándares de calidad y las mejores prácticas de la industria.
@@ -76,12 +75,6 @@ const AboutSection = () => {
                                 active={tab === "educacion"}
                             >
                                 Educacion
-                            </TabButton>
-                            <TabButton
-                                selectTab={() => handleTabChange("experiencia")}
-                                active={tab === "experiencia"}
-                            >
-                                Experiencia
                             </TabButton>
                         </div>
                         <div className='mt-8'>{TAB_DATA.find((t) => t.id === tab).content}</div>
