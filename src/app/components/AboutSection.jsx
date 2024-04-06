@@ -49,7 +49,7 @@ const AboutSection = () => {
                 <div className='mb-5'>
                 <Image
                     className='rounded'
-                    src="/images/pcsetup.png"
+                    src="/static/images/pcsetup.png"
                     alt="hero image"
                     width={500}
                     height={500}
