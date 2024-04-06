@@ -8,29 +8,47 @@ const projectsData = [
         title: "Landing page",
         description: "Landing page para un hotel de mascotas",
         image: "static/images/landing_page.png",
-        tag: ["All", "Web"]
+        tag: ["All", "Web"],
+        gitUrl:"https://github.com/MadLucas/landing_page1",
+        previewUrl:"https://unrivaled-kringle-82dc30.netlify.app"
     },
     {
         id: 2,
         title: "Bookstore",
         description: "Marketplace de libros",
         image: "/static/images/Bookstore.png",
-        tag: ["All", "Web"]
+        tag: ["All", "Web"],
+        gitUrl:"https://github.com/MadLucas/e-comerceudd-backend",
+        previewUrl:"https://regal-chimera-e19bc1.netlify.app"
     },
     {
         id: 3,
         title: "Dashboard Cripto",
         description: "Consumo de api para crear dashboard",
         image: "/static/images/dashboard_cripto.png",
-        tag: ["All", "Web"]
+        tag: ["All", "Web"],
+        gitUrl:"https://github.com/MadLucas/dashboard_entrega_3",
+        previewUrl:"https://stellular-pegasus-ba45a8.netlify.app/"
     },
     {
         id: 4,
         title: "Crud",
         description: "Crud con operaciones basicas",
         image: "/static/images/Crud.png",
-        tag: ["All", "Web"]
+        tag: ["All", "Web"],
+        gitUrl:"https://github.com/MadLucas/aplicacion_crud",
+        previewUrl:"https://cosmic-khapse-1a8f2c.netlify.app"
+    },
+    {
+        id: 4,
+        title: "RestaruantApp",
+        description: "Web para Restaurant",
+        image: "/static/images/micocinarestaurant.png",
+        tag: ["All", "Web"],
+        gitUrl:"https://github.com/MadLucas/proyecto-restaurant-entrega4",
+        previewUrl:"https://tourmaline-cranachan-dd23b5.netlify.app"
     }
+
 ]
 
 const ProjectsSection = () => {
@@ -43,7 +61,9 @@ const ProjectsSection = () => {
                         key={project.id}
                         title={project.title}
                         description={project.description}
-                        imgUrl={project.image} />)}
+                        imgUrl={project.image}
+                        gitUrl={project.gitUrl} 
+                        previewUrl={project.previewUrl}/>)}
             </div>
         </>
 
