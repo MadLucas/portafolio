@@ -33,6 +33,7 @@ const EmailSection = () => {
         console.log('Response:', resData);
         if (response.status === 'succes') {
             console.log('Message sent.');
+            alert("Mensaje enviado con exito!");
         }
     }
 
