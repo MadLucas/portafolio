@@ -54,7 +54,8 @@ const projectsData = [
 const ProjectsSection = () => {
     return (
         <>
-            <h2 className='text-center text-4xl font-bold text-white mt-4 mb-4 '>Mis proyectos</h2>
+        <section id='proyectos'>
+        <h2 className='text-center text-4xl font-bold text-white mt-4 mb-4 '>Mis proyectos</h2>
             <div className='grid md:grid-cols-3 gap-8 md:gap-12'>
                 {projectsData.map((project) =>
                     <ProjectsCard
@@ -65,6 +66,7 @@ const ProjectsSection = () => {
                         gitUrl={project.gitUrl} 
                         previewUrl={project.previewUrl}/>)}
             </div>
+        </section>
         </>
 
     )
