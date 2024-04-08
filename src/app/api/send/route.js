@@ -21,10 +21,10 @@ export async function POST(req, res) {
             subject: 'Solicitud de Contacto Portafolio',
             react:(
                 <>
-            <h1>${subject}</h1>
-            <p>${message}</p>
+            <h1>{subject}</h1>
+            <p>{message}</p>
             <p>Nuevo mensaje en tu sitio web</p>
-            <p>${email}</p>
+            <p>{email}</p>
                 </>
             ),
         });
