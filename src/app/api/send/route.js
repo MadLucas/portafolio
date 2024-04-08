@@ -6,22 +6,27 @@ const fromEmail = process.env.FROM_EMAIL;
 const toEmail = process.env.TO_EMAIL;
 
 export async function POST(req, res) {
-    console.log(req.body); // Verifica que los datos del formulario se estén recibiendo correctamente
-    const { email, subject, message } = req.body; // Verifica que los campos email, subject y message estén presentes en req.body
+    const body = await req.json(); // Interpreta el cuerpo de la solicitud como JSON
+
+    const { email, subject, message } = body;
+
+    console.log("Subject:", subject);
+    console.log("Message:", message);
+    console.log("Email:", email);
+
     try {
-        console.log("Subject:", subject);
-        console.log("Message:", message);
-        console.log("Email:", email)
         const data = await resend.emails.send({
             from: fromEmail,
             to: [toEmail],
             subject: 'Solicitud de Contacto Portafolio',
-            react: `
-            <h1>${subject || 'Hello world'}</h1>
+            react:(
+                <>
+            <h1>${subject}</h1>
             <p>${message}</p>
             <p>Nuevo mensaje en tu sitio web</p>
             <p>${email}</p>
-          `,
+                </>
+            ),
         });
         console.log(subject, message, email)
         console.log(data); // Verifica la respuesta de la función de envío de correo
