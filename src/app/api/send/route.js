@@ -19,21 +19,23 @@ export async function POST(req, res) {
             from: fromEmail,
             to: [toEmail],
             subject: 'Solicitud de Contacto Portafolio',
-            react:(
+            react: (
                 <>
-            <h1>${subject}</h1>
-            <p>${message}</p>
-            <p>Nuevo mensaje en tu sitio web</p>
-            <p>${email}</p>
+                    <h1>{subject}</h1>
+                    <p>{message}</p>
+                    <p>Nuevo mensaje en tu sitio web</p>
+                    <p>{email}</p>
                 </>
             ),
         });
         console.log(subject, message, email)
         console.log(data); // Verifica la respuesta de la función de envío de correo
 
-        return NextResponse.json(data);
+        // Envía una respuesta con un mensaje de éxito
+        return NextResponse.json({ success: true, message: "Mensaje enviado exitosamente." });
     } catch (error) {
-        console.error(error); // Asegúrate de manejar los errores y registrarlos adecuadamente
-        return NextResponse.json({ error });
+        console.error(error);
+        // Envía una respuesta con un mensaje de error
+        return NextResponse.json({ success: false, message: "Hubo un error al enviar el mensaje." });
     }
 }
