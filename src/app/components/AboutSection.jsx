@@ -19,6 +19,7 @@ const TAB_DATA = [
                 <li>Tailwind</li>
                 <li>React</li>
                 <li>Nextjs</li>
+                <li>Firebase</li>
             </ul>
         )
     },
