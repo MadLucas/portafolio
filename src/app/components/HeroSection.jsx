@@ -36,9 +36,11 @@ const HeroSection = () => {
                         <button className="px-6 py-3 w-full sm:w-fit rounded-full mr-4 bg-gradient-to-br from-orange-500 via-orange-700 to-red-600 hover:bg-slate-200 text-white">
                             Open to work!
                         </button>
-                        <button className="px-6 py-3 w-full sm:w-fit rounded-full mr-4 bg-transparent hover:bg-slate-800 text-white border border-white mt-3">
-                            Dercaga cv
-                        </button>
+                        <a href="/CURRICULUM LUCAS 2024.pdf" download>
+                            <button className="px-6 py-3 w-full sm:w-fit rounded-full mr-4 bg-transparent hover:bg-slate-800 text-white border border-white mt-3">
+                                Descargar CV
+                            </button>
+                        </a>
                     </div>
                 </div>
                 <div className='col-span-5 place-self-center mt-4 lg:mt-0'>

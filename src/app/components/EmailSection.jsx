@@ -33,6 +33,7 @@ const EmailSection = () => {
         console.log('Response:', resData);
         if (response.status === 'succes') {
             console.log('Message sent.');
+            alert("Mensaje enviado con exito")
         }
     }
 
@@ -42,7 +43,7 @@ const EmailSection = () => {
                 <h5 className='text-xl font-bold text-white my-2'>Let's Connect!</h5>
                 <p className='text-[#ADB7BE] mb-4 max-w-md'>
                     {""}
-                    "Actualmente estoy buscando nuevas oportunidades, mi inbox siempre está abierto. Ya sea que tengas una pregunta o simplemente quieras saludar, haré todo lo posible por responder."
+                    Actualmente estoy buscando nuevas oportunidades, mi inbox siempre está abierto. Ya sea que tengas una pregunta o simplemente quieras saludar, haré todo lo posible por responder.
                 </p>
                 <div className='socials flex flex-row gap-2 '>
                     <Link href={"https://github.com/MadLucas"} className='text-white hover:text-orange-700'>GitHub</Link>

@@ -47,6 +47,15 @@ const projectsData = [
         tag: ["All", "Web"],
         gitUrl:"https://github.com/MadLucas/proyecto-restaurant-entrega4",
         previewUrl:"https://tourmaline-cranachan-dd23b5.netlify.app"
+    },
+    {
+        id: 5,
+        title: "Cotizador Roller",
+        description: "App, Fullstack, para cotizar rollers con base de datos sql",
+        image: "/static/images/cotizador.png",
+        tag: ["All", "Web"],
+        gitUrl:"",
+        previewUrl:"https://cotizadorweb-prisma.vercel.app/"
     }
 
 ]
