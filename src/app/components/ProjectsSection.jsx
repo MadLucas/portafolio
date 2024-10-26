@@ -3,6 +3,18 @@ import React from 'react'
 import ProjectsCard from './ProjectsCard'
 
 const projectsData = [
+    
+    
+    
+    {
+        id: 0,
+        title: "Landing page Acoloma Deco",
+        description: "Landing page, para una empresa de decoracion dedicada a la venta de cortinas y persianas",
+        image: "static/images/landing-page-acoloma.png",
+        tag: ["All", "Web"],
+        gitUrl:"https://acoloma.cl",
+        previewUrl:"https://acoloma.cl"
+    },
     {
         id: 1,
         title: "Landing page",
