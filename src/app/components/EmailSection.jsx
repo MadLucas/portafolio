@@ -1,99 +1,123 @@
-'use client';
+'use client'
 
 import React from 'react'
-import Link from "next/link";
-import Image from "next/image"
+import Link from 'next/link'
 
 const EmailSection = () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault()
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        console.log('Email:', e.target.email.value);
-        console.log('Subject:', e.target.subject.value);
-        console.log('Message:', e.target.message.value);
+    const data = {
+      email: e.target.email.value,
+      subject: e.target.subject.value,
+      message: e.target.message.value,
+    }
+    const endpoint = '/api/send'
 
-        const data = {
-            email: e.target.email.value,
-            subject: e.target.subject.value,
-            message: e.target.message.value,
-        }
-        const JSONdata = JSON.stringify(data);
-        const endpoint = "/api/send";
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
 
-        const options = {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSONdata,
-        }
-        
-        const response = await fetch(endpoint, options);
-        const resData = await response.json();
-        console.log('Response:', resData);
-        if (response.status === 'succes') {
-            console.log('Message sent.');
-            alert("Mensaje enviado con exito")
-        }
+    let resData = null
+    try {
+      resData = await response.json()
+    } catch {
+      resData = null
     }
 
-    return (
-        <section className='grid md:grid-cols-2 my-12 md:my-12 py-24 gap-4' id='contacto'>
+    if (response.ok) {
+      alert('Mensaje enviado con éxito')
+      e.target.reset()
+      return
+    }
+
+    const msg =
+      resData?.error?.message ||
+      resData?.message ||
+      'No se pudo enviar el mensaje. Intenta de nuevo más tarde.'
+    alert(msg)
+  }
+
+  return (
+    <section
+      className="relative border-t border-white/[0.06] py-16 sm:py-24"
+      id="contacto"
+    >
+      <div className="grid gap-12 md:grid-cols-2 md:gap-16">
+        <div>
+          <h2 className="mb-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Hablemos
+          </h2>
+          <p className="mb-6 max-w-md text-[#8b949e]">
+            Estoy abierto a nuevas oportunidades. Si tienes una pregunta o quieres saludar,
+            responderé cuando pueda.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <Link
+              href="https://github.com/MadLucas"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-accent-orange transition hover:text-accent-coral focus:outline-none focus:ring-2 focus:ring-accent-orange/40 focus:ring-offset-2 focus:ring-offset-page rounded"
+            >
+              GitHub
+            </Link>
+          </div>
+        </div>
+        <div>
+          <form className="flex flex-col gap-4 rounded-2xl border border-white/[0.08] bg-surface/60 p-6 shadow-card backdrop-blur-sm" onSubmit={handleSubmit}>
             <div>
-                <h5 className='text-xl font-bold text-white my-2'>Let's Connect!</h5>
-                <p className='text-[#ADB7BE] mb-4 max-w-md'>
-                    {""}
-                    Actualmente estoy buscando nuevas oportunidades, mi inbox siempre está abierto. Ya sea que tengas una pregunta o simplemente quieras saludar, haré todo lo posible por responder.
-                </p>
-                <div className='socials flex flex-row gap-2 '>
-                    <Link href={"https://github.com/MadLucas"} className='text-white hover:text-orange-700'>GitHub</Link>
-                </div>
+              <label htmlFor="email" className="mb-2 block text-sm font-medium text-[#c9d1d9]">
+                Tu email
+              </label>
+              <input
+                name="email"
+                type="email"
+                id="email"
+                required
+                autoComplete="email"
+                placeholder="tu@email.com"
+                className="block w-full rounded-lg border border-surface-border bg-page px-3 py-2.5 text-sm text-white placeholder-[#6e7681] transition focus:border-accent-orange/50 focus:outline-none focus:ring-2 focus:ring-accent-orange/25"
+              />
             </div>
             <div>
-                <form className='flex flex-col gap-3' onSubmit={handleSubmit}>
-                    <label htmlFor="email" type="email" className='text-white block mb-2 text-sm font-medium'>Tu email</label>
-                    <input
-                        name="email"
-                        type="email" 
-                        id='email' 
-                        required 
-                        placeholder='jacob@gmail.com'
-                        className='bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 tx-sm rounded-lg block w-full p-2.5'/>
-                    
-                    <label htmlFor="email" type="subject" className='text-white block mb-2 text-sm font-medium'>Asunto</label>
-                    <input
-                        name="subject" 
-                        type="text" 
-                        id='subject' 
-                        required 
-                        placeholder='Solo pasa a saludar! :)'
-                        className='bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 tx-sm rounded-lg block w-full p-2.5'/>
-                    <div>
-                        <div className='mb-6'>
-                            <label 
-                                htmlFor="message"
-                                className='text-white block text-sm mb-2 font-medium'
-                            >Comentarios
-                            </label>
-                            <textarea 
-                                name="message"
-                                type="text"
-                                id='message'
-                                className='bg-[#18191E] border border-[#33353F] placeholder-[#9CA2A9] text-gray-100 tx-sm rounded-lg block w-full p-2.5'
-                                placeholder='Hablemos!'
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <button 
-                            type='submit'
-                            className='bg-orange-600 hover:bg-orange-400 text-white font-medium py-2.5 px-5 rounded-lg w-full'
-                        >Enviar Mensaje</button>
-                    </div>
-                </form>
+              <label htmlFor="subject" className="mb-2 block text-sm font-medium text-[#c9d1d9]">
+                Asunto
+              </label>
+              <input
+                name="subject"
+                type="text"
+                id="subject"
+                required
+                placeholder="Solo pasaba a saludar"
+                className="block w-full rounded-lg border border-surface-border bg-page px-3 py-2.5 text-sm text-white placeholder-[#6e7681] transition focus:border-accent-orange/50 focus:outline-none focus:ring-2 focus:ring-accent-orange/25"
+              />
             </div>
-        </section>
-    )
+            <div>
+              <label htmlFor="message" className="mb-2 block text-sm font-medium text-[#c9d1d9]">
+                Mensaje
+              </label>
+              <textarea
+                name="message"
+                id="message"
+                required
+                rows={5}
+                placeholder="Hablemos…"
+                className="block w-full resize-y rounded-lg border border-surface-border bg-page px-3 py-2.5 text-sm text-white placeholder-[#6e7681] transition focus:border-accent-orange/50 focus:outline-none focus:ring-2 focus:ring-accent-orange/25"
+              />
+            </div>
+            <button
+              type="submit"
+              className="mt-1 w-full rounded-lg bg-gradient-to-r from-accent-orange to-accent-coral py-3 text-sm font-semibold text-white shadow-glow transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-accent-orange/50 focus:ring-offset-2 focus:ring-offset-page"
+            >
+              Enviar mensaje
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  )
 }
 
 export default EmailSection

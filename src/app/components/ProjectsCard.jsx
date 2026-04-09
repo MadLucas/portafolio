@@ -1,30 +1,63 @@
 'use client'
-import React from 'react';
-import {CodeBracketIcon, EyeIcon} from "@heroicons/react/24/outline";
-import Link from 'next/link';
+
+import React from 'react'
+import { CodeBracketIcon, EyeIcon } from '@heroicons/react/24/outline'
+import Link from 'next/link'
+
+const resolveBgUrl = (imgUrl) => {
+  if (!imgUrl || typeof imgUrl !== 'string') return ''
+  const t = imgUrl.trim()
+  if (t.startsWith('http://') || t.startsWith('https://')) return t
+  if (t.startsWith('/')) return t
+  return `/${t}`
+}
 
 const ProjectsCard = ({ imgUrl, title, description, gitUrl, previewUrl }) => {
-    return (
-        <div>
-            <div
-                className='h-52 md:h-72 rounded-t-xl relative group'
-                style={{ background: `url(${imgUrl})`, backgroundSize: "cover", backgroundPosition:"center"}}
-            >
-                <div className='overlay flex items-center justify-center absolute top-0 left-0 w-full h-full bg-[#181818] bg-opacity-0 hidden group-hover:flex group-hover:bg-opacity-80 transition-all duration-500'>
-                    <Link href={gitUrl} className='h-14 w-14 mr-2 border-2 relative rounded-full border-[#ADB7BE] hover:border-white group/link '>
-                        <CodeBracketIcon className='h-10 w-10 text-[#ADB7BE] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group-hover/link:text-white'/>
-                    </Link>
-                    <Link href={previewUrl} className='h-14 w-14 border-2 relative rounded-full border-[#ADB7BE] hover:border-white group/link'>
-                        <EyeIcon className='h-10 w-10 text-[#ADB7BE] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group-hover/link:text-white'/>
-                    </Link>
-                </div>
-            </div>
-            <div className='text-white rounded-b-xl bg-[#181818] py-6 px-4'>
-                <h5 className='text-xl font-semibold mb-2'>{title}</h5>
-                <p className='text-[#ADB7BE]'>{description}</p>
-            </div>
-        </div>
-    );
-};
+  const bgUrl = resolveBgUrl(imgUrl)
+  const hasRepoLink = Boolean(gitUrl?.trim())
+  const hasPreviewLink = Boolean(previewUrl?.trim())
 
-export default ProjectsCard;
+  return (
+    <article className="group overflow-hidden rounded-2xl border border-white/[0.06] bg-surface-elevated/40 shadow-card ring-1 ring-white/[0.04] transition hover:border-white/[0.1] hover:shadow-glow">
+      <div
+        className="relative h-52 bg-surface md:h-60"
+        style={{
+          backgroundImage: `url(${bgUrl})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="absolute inset-0 flex items-center justify-center gap-4 bg-page/0 opacity-0 transition duration-300 group-hover:bg-page/75 group-hover:opacity-100">
+          {hasRepoLink ? (
+            <Link
+              href={gitUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#ADB7BE] transition hover:border-white focus:outline-none focus:ring-2 focus:ring-accent-orange/50"
+              aria-label={`Código fuente de ${title}`}
+            >
+              <CodeBracketIcon className="h-9 w-9 text-[#ADB7BE] hover:text-white" />
+            </Link>
+          ) : null}
+          {hasPreviewLink ? (
+            <Link
+              href={previewUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#ADB7BE] transition hover:border-white focus:outline-none focus:ring-2 focus:ring-accent-orange/50"
+              aria-label={`Ver demo de ${title}`}
+            >
+              <EyeIcon className="h-9 w-9 text-[#ADB7BE] hover:text-white" />
+            </Link>
+          ) : null}
+        </div>
+      </div>
+      <div className="border-t border-white/[0.06] bg-surface/80 px-5 py-6">
+        <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
+        <p className="text-sm leading-relaxed text-[#8b949e]">{description}</p>
+      </div>
+    </article>
+  )
+}
+
+export default ProjectsCard

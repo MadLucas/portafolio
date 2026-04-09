@@ -2,60 +2,67 @@
 
 import React from 'react'
 import Image from 'next/image'
-import { TypeAnimation } from 'react-type-animation';
+import { TypeAnimation } from 'react-type-animation'
 
 const HeroSection = () => {
-    return (
-        <section>
-            <div className="grid grid-cols-1 lg sm:grid-cols-12">
-                <div className='col-span-7 place-self-center text-center sm:text-left'>
-                    <h1 className='text-white mb-4 text-4xl sm:text-5xl lg:text-6xl font-extrabold'><span className='text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-orange-700 to-red-600 '>Hola, soy {""}</span>
-                        <br></br>
-                        <TypeAnimation
-                            sequence={[
-                                // Same substring at the start will only be typed out once, initially
-                                'Lucas!',
-                                1000, // wait 1s before replacing "Mice" with "Hamsters"
-                                'Fullstack web developer',
-                                1000,
-                            ]}
-                            wrapper="span"
-                            speed={30}
-                            repeat={Infinity} />
-                    </h1>
-                    <p className='text-white text-lg lg:text-xl mb-6'>Bienvenidos a mi sitio web! Soy <span className='text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-orange-700 to-red-700'>Lucas</span>, un desarrollador web Fullstack. En este espacio, podrás explorar algunos de mis proyectos más recientes y conocer más acerca de mi trayectoria y habilidades. Desde aplicaciones web dinámicas hasta interfaces intuitivas, mi enfoque se centra en ofrecer experiencias digitales que impacten y resuelvan necesidades del mundo real. Te invito a navegar por las diferentes secciones para descubrir cómo puedo ayudarte a materializar tus ideas y proyectos en el mundo digital.
-
-
-
-
-
-
-
-                    </p>
-                    <div>
-                        <button className="px-6 py-3 w-full sm:w-fit rounded-full mr-4 bg-gradient-to-br from-orange-500 via-orange-700 to-red-600 hover:bg-slate-200 text-white">
-                            Open to work!
-                        </button>
-                        <a href="/CURRICULUM LUCAS 2024.pdf" download>
-                            <button className="px-6 py-3 w-full sm:w-fit rounded-full mr-4 bg-transparent hover:bg-slate-800 text-white border border-white mt-3">
-                                Descargar CV
-                            </button>
-                        </a>
-                    </div>
-                </div>
-                <div className='col-span-5 place-self-center mt-4 lg:mt-0'>
-                    <div className='w-[250px] h-[250px] lg:w-[400px] lg:h-[400px]'>
-                        <Image
-                            className='rounded-full'
-                            src="/static/images/portafolioimage.png"
-                            alt="hero image"
-                            width={500}
-                            height={500} />
-                    </div>
-                </div>
+  return (
+    <section className="relative pb-16 pt-4 md:pb-24">
+      <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
+        <div className="place-self-center text-center sm:text-left lg:col-span-7">
+          <h1 className="mb-5 text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl lg:leading-[1.1]">
+            <span className="bg-gradient-to-r from-accent-orange via-accent-coral to-accent-rose bg-clip-text text-transparent">
+              Hola, soy{' '}
+            </span>
+            <br className="sm:hidden" />
+            <span className="text-white">
+              <TypeAnimation
+                sequence={['Lucas!', 1200, 'Fullstack web developer', 1200]}
+                wrapper="span"
+                speed={40}
+                repeat={Infinity}
+              />
+            </span>
+          </h1>
+          <p className="mb-8 max-w-xl text-pretty text-base leading-relaxed text-white/85 sm:text-lg">
+            Bienvenidos a mi sitio web. Soy{' '}
+            <span className="bg-gradient-to-r from-accent-orange to-accent-coral bg-clip-text font-medium text-transparent">
+              Lucas
+            </span>
+            , desarrollador web fullstack. Aquí encontrarás proyectos recientes y
+            un poco de mi trayectoria. Me enfoco en experiencias digitales claras,
+            accesibles y con impacto real.
+          </p>
+          <button
+            type="button"
+            className="rounded-full bg-gradient-to-br from-accent-orange via-accent-coral to-accent-rose px-7 py-3 text-sm font-semibold text-white shadow-glow transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-accent-orange/50 focus:ring-offset-2 focus:ring-offset-page sm:w-fit"
+          >
+            Open to work!
+          </button>
+        </div>
+        <div className="flex justify-center lg:col-span-5 lg:justify-end">
+          <div className="relative">
+            <div
+              className="absolute -inset-3 rounded-full bg-gradient-to-br from-accent-orange/25 via-transparent to-accent-rose/20 blur-2xl"
+              aria-hidden
+            />
+            <div className="relative flex aspect-square w-[200px] items-center justify-center rounded-full bg-surface p-1 shadow-card ring-1 ring-white/10 sm:w-[220px] lg:w-[240px]">
+              <div className="relative h-full w-full overflow-hidden rounded-full bg-[#0d1117]">
+                <Image
+                  className="object-cover object-center"
+                  src="/Lucas.jpg"
+                  alt="Lucas Fernández"
+                  width={480}
+                  height={480}
+                  sizes="(max-width: 1024px) 220px, 240px"
+                  priority
+                />
+              </div>
             </div>
-        </section>
-    )
+          </div>
+        </div>
+      </div>
+    </section>
+  )
 }
 
 export default HeroSection

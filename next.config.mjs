@@ -1,4 +1,9 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  experimental: {
+    // Menos trabajo en dev al importar iconos por barril
+    optimizePackageImports: ['@heroicons/react', 'recharts'],
+  },
+}
 
-export default nextConfig;
+export default nextConfig

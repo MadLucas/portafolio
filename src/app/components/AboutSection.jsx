@@ -1,88 +1,101 @@
 'use client'
-import React, { useState, useTransition } from 'react';
-import Image from 'next/image';
-import TabButton from './TabButton';
+
+import React, { useState, useTransition } from 'react'
+import Image from 'next/image'
+import TabButton from './TabButton'
 
 const TAB_DATA = [
-    {
-        title: "skills",
-        id: "skills",
-        content: (
-            <ul>
-                <li>node.js</li>
-                <li>Express</li>
-                <li>Javascrip</li>
-                <li>MongoDB</li>
-                <li>HTML5</li>
-                <li>CSS</li>
-                <li>Bootstrap</li>
-                <li>Tailwind</li>
-                <li>React</li>
-                <li>Nextjs</li>
-            </ul>
-        )
-    },
-    {
-        title: "educacion",
-        id: "educacion",
-        content: (
-            <ul>
-                <li>Universidad Del Desarrollo</li>
-            </ul>
-        )
-    }
-];
+  {
+    title: "skills",
+    id: "skills",
+    content: (
+      <ul className="grid list-none gap-2 text-[#c9d1d9] sm:grid-cols-2">
+        <li className="rounded-lg border border-white/[0.06] bg-surface-elevated/50 px-3 py-2">Node.js</li>
+        <li className="rounded-lg border border-white/[0.06] bg-surface-elevated/50 px-3 py-2">Express</li>
+        <li className="rounded-lg border border-white/[0.06] bg-surface-elevated/50 px-3 py-2">JavaScript</li>
+        <li className="rounded-lg border border-white/[0.06] bg-surface-elevated/50 px-3 py-2">MongoDB</li>
+        <li className="rounded-lg border border-white/[0.06] bg-surface-elevated/50 px-3 py-2">HTML5</li>
+        <li className="rounded-lg border border-white/[0.06] bg-surface-elevated/50 px-3 py-2">CSS</li>
+        <li className="rounded-lg border border-white/[0.06] bg-surface-elevated/50 px-3 py-2">Bootstrap</li>
+        <li className="rounded-lg border border-white/[0.06] bg-surface-elevated/50 px-3 py-2">Tailwind</li>
+        <li className="rounded-lg border border-white/[0.06] bg-surface-elevated/50 px-3 py-2">React</li>
+        <li className="rounded-lg border border-white/[0.06] bg-surface-elevated/50 px-3 py-2">Next.js</li>
+      </ul>
+    ),
+  },
+  {
+    title: "educacion",
+    id: "educacion",
+    content: (
+      <ul className="text-[#c9d1d9]">
+        <li className="rounded-lg border border-white/[0.06] bg-surface-elevated/50 px-4 py-3">
+          Universidad del Desarrollo
+        </li>
+      </ul>
+    ),
+  },
+]
 
 const AboutSection = () => {
-    const [tab, setTab] = useState("skills");
-    const [isPending, startTransition] = useTransition();
+  const [tab, setTab] = useState("skills")
+  const [, startTransition] = useTransition()
 
-    const handleTabChange = (id) => {
-        startTransition(() => {
-            setTab(id);
-        });
-    };
+  const handleTabChange = (id) => {
+    startTransition(() => {
+      setTab(id)
+    })
+  }
 
-    return (
-        <section className='text-white' id='about'>
-            <div className='md:grid md:grid-cols-2 gap-8 items-center py-8 px-4 xl:gap-16 sm:py-16 sm:px-16'>
-                <div className='mb-5'>
-                <Image
-                    className='rounded'
-                    src="/static/images/pcsetup.png"
-                    alt="hero image"
-                    width={500}
-                    height={500}
-                />
-                </div>
+  const activeContent = TAB_DATA.find((t) => t.id === tab)?.content
 
-                
-                <div className='mt-4 md:mt-0 text-left flex flex-col h-full'>
-                    <h2 className='text-4xl font-bold text-white mb-4'>Acerca de mí</h2>
-                    <p className='text-base md:text-lg'>
-                        Soy un desarrollador fullstack apasionado por crear aplicaciones interactivas y responsivas. Mi experiencia abarca Javascript, React, MongoDB, HTML, CSS, Next.js, Node.js, Express y Git. Mi capacidad de aprendizaje rápido me impulsa a expandir continuamente mi conocimiento y conjunto de habilidades. Disfruto trabajando en equipo y enfocándome en el desarrollo de aplicaciones web con altos estándares de calidad y las mejores prácticas de la industria.
-                    </p>
-                    <div className='mt-8'>
-                        <div className='flex flex-row'>
-                            <TabButton
-                                selectTab={() => handleTabChange("skills")}
-                                active={tab === "skills"}
-                            >
-                                Skills
-                            </TabButton>
-                            <TabButton
-                                selectTab={() => handleTabChange("educacion")}
-                                active={tab === "educacion"}
-                            >
-                                Educacion
-                            </TabButton>
-                        </div>
-                        <div className='mt-8'>{TAB_DATA.find((t) => t.id === tab).content}</div>
-                    </div>
-                </div>
+  return (
+    <section className="relative border-t border-white/[0.06] text-white" id="about">
+      <div className="py-16 sm:py-20">
+        <div className="grid gap-12 md:grid-cols-2 md:items-center md:gap-16">
+          <div className="order-2 md:order-1">
+            <h2 className="mb-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              Acerca de mí
+            </h2>
+            <p className="text-base leading-relaxed text-[#c9d1d9] md:text-lg">
+              Soy un desarrollador fullstack apasionado por crear aplicaciones interactivas y
+              responsivas. Mi experiencia abarca JavaScript, React, MongoDB, HTML, CSS, Next.js,
+              Node.js, Express y Git. Aprendo rápido y disfruto trabajar en equipo con foco en
+              calidad y buenas prácticas.
+            </p>
+            <div className="mt-8">
+              <div className="flex flex-row gap-2 border-b border-surface-border pb-px">
+                <TabButton
+                  selectTab={() => handleTabChange("skills")}
+                  active={tab === "skills"}
+                >
+                  Skills
+                </TabButton>
+                <TabButton
+                  selectTab={() => handleTabChange("educacion")}
+                  active={tab === "educacion"}
+                >
+                  Educación
+                </TabButton>
+              </div>
+              <div className="mt-6">{activeContent}</div>
             </div>
-        </section>
-    );
-};
+          </div>
+          <div className="order-1 md:order-2">
+            <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0d1117] p-4 shadow-card ring-1 ring-white/[0.04]">
+              <Image
+                className="h-auto w-full rounded-lg object-cover"
+                src="/static/images/PortafolioStck.jpg"
+                alt="Stack tecnológico y herramientas"
+                width={560}
+                height={560}
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
 
-export default AboutSection;
+export default AboutSection

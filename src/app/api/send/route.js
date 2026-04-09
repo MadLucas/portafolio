@@ -1,39 +1,80 @@
-import { Resend } from "resend";
-import { NextResponse } from "next/server";
+import { Resend } from "resend"
+import { NextResponse } from "next/server"
+import React from "react"
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const fromEmail = process.env.FROM_EMAIL;
-const toEmail = process.env.TO_EMAIL;
+const getResend = () => {
+  const key = process.env.RESEND_API_KEY
+  if (!key) return null
+  return new Resend(key)
+}
 
-export async function POST(req, res) {
-    const body = await req.json(); // Interpreta el cuerpo de la solicitud como JSON
+const fromEmail = process.env.FROM_EMAIL
+const toEmail = process.env.TO_EMAIL
 
-    const { email, subject, message } = body;
+const ContactEmail = ({ subject, message, email }) => (
+  <>
+    <h1 style={{ fontSize: '1.25rem', marginBottom: '0.75rem' }}>{subject}</h1>
+    <p style={{ whiteSpace: 'pre-wrap', marginBottom: '1rem' }}>{message}</p>
+    <p style={{ color: '#666', fontSize: '0.875rem' }}>Nuevo mensaje desde el portafolio</p>
+    <p style={{ marginTop: '0.5rem' }}>
+      <strong>De:</strong> {email}
+    </p>
+  </>
+)
 
-    console.log("Subject:", subject);
-    console.log("Message:", message);
-    console.log("Email:", email);
+export async function POST(req) {
+  const resend = getResend()
+  if (!resend || !fromEmail || !toEmail) {
+    return NextResponse.json(
+      { error: { message: 'Configuración de correo incompleta en el servidor.' } },
+      { status: 500 }
+    )
+  }
 
-    try {
-        const data = await resend.emails.send({
-            from: fromEmail,
-            to: [toEmail],
-            subject: 'Solicitud de Contacto Portafolio',
-            react:(
-                <>
-            <h1>${subject}</h1>
-            <p>${message}</p>
-            <p>Nuevo mensaje en tu sitio web</p>
-            <p>${email}</p>
-                </>
-            ),
-        });
-        console.log(subject, message, email)
-        console.log(data); // Verifica la respuesta de la función de envío de correo
+  let body
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: { message: 'JSON inválido' } }, { status: 400 })
+  }
 
-        return NextResponse.json(data);
-    } catch (error) {
-        console.error(error); // Asegúrate de manejar los errores y registrarlos adecuadamente
-        return NextResponse.json({ error });
-    }
+  const { email, subject, message } = body
+
+  if (
+    typeof email !== 'string' ||
+    typeof subject !== 'string' ||
+    typeof message !== 'string' ||
+    !email.trim() ||
+    !subject.trim() ||
+    !message.trim()
+  ) {
+    return NextResponse.json(
+      { error: { message: 'Faltan email, asunto o mensaje.' } },
+      { status: 400 }
+    )
+  }
+
+  if (subject.length > 200 || message.length > 8000) {
+    return NextResponse.json(
+      { error: { message: 'Asunto o mensaje demasiado largo.' } },
+      { status: 400 }
+    )
+  }
+
+  try {
+    const data = await resend.emails.send({
+      from: fromEmail,
+      to: [toEmail],
+      subject: `Contacto portafolio: ${subject}`,
+      react: <ContactEmail subject={subject} message={message} email={email} />,
+    })
+
+    return NextResponse.json(data)
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json(
+      { error: { message: 'No se pudo enviar el correo.' } },
+      { status: 502 }
+    )
+  }
 }
