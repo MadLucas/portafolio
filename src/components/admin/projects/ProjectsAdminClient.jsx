@@ -5,6 +5,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import {
   collection,
   deleteDoc,
+  deleteField,
   doc,
   getDocs,
   orderBy,
@@ -18,18 +19,50 @@ import { COL } from '../../../lib/firebase/collections'
 import { liquidGlassPanel } from '../../../lib/admin/glass'
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
+const MAX_PDF_BYTES = 12 * 1024 * 1024
 
 const sanitizeStorageFileName = (name) => {
-  const n = (name || 'imagen').replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 96)
-  return n || 'imagen'
+  const n = (name || 'archivo').replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 96)
+  return n || 'archivo'
+}
+
+const toDateInputValue = (v) => {
+  if (v == null || v === '') return ''
+  if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}/.test(v)) return v.slice(0, 10)
+  if (typeof v === 'object' && v !== null && typeof v.toDate === 'function') {
+    const d = v.toDate()
+    if (!Number.isNaN(d.getTime())) return d.toISOString().slice(0, 10)
+  }
+  return ''
+}
+
+const normalizeImagesFromRow = (row) => {
+  if (Array.isArray(row.images) && row.images.length > 0) {
+    return row.images.filter((u) => typeof u === 'string' && u.trim())
+  }
+  if (row.image && typeof row.image === 'string' && row.image.trim()) {
+    return [row.image.trim()]
+  }
+  return []
+}
+
+const normalizeSkillsFromRow = (row) => {
+  if (!Array.isArray(row.skills)) return []
+  return row.skills.map((s) => String(s).trim()).filter(Boolean)
+}
+
+const normalizePdfsFromRow = (row) => {
+  if (!Array.isArray(row.pdfs)) return []
+  return row.pdfs.filter((p) => p && typeof p.url === 'string' && p.url.trim())
 }
 
 const emptyForm = {
   title: '',
   description: '',
-  image: '',
-  gitUrl: '',
-  previewUrl: '',
+  skills: [],
+  imageUrls: [],
+  executedAt: '',
+  pdfs: [],
   sortOrder: 0,
   active: true,
 }
@@ -40,8 +73,11 @@ const ProjectsAdminClient = () => {
   const [saving, setSaving] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [form, setForm] = useState(emptyForm)
-  const [imageFile, setImageFile] = useState(null)
-  const [imagePreviewUrl, setImagePreviewUrl] = useState('')
+  const [skillInput, setSkillInput] = useState('')
+  const [imageUrlInput, setImageUrlInput] = useState('')
+  const [pendingImageFiles, setPendingImageFiles] = useState([])
+  const [pendingPdfFiles, setPendingPdfFiles] = useState([])
+  const [pendingImagePreviews, setPendingImagePreviews] = useState([])
 
   const load = useCallback(async () => {
     const db = getFirebaseFirestore()
@@ -68,50 +104,113 @@ const ProjectsAdminClient = () => {
   }, [load])
 
   useEffect(() => {
-    if (!imageFile) {
-      setImagePreviewUrl('')
-      return
+    const urls = pendingImageFiles.map((f) => URL.createObjectURL(f))
+    setPendingImagePreviews(urls)
+    return () => {
+      urls.forEach((u) => URL.revokeObjectURL(u))
     }
-    const url = URL.createObjectURL(imageFile)
-    setImagePreviewUrl(url)
-    return () => URL.revokeObjectURL(url)
-  }, [imageFile])
+  }, [pendingImageFiles])
 
-  const handleImageFileChange = (e) => {
-    const file = e.target.files?.[0]
-    if (!file) {
-      setImageFile(null)
+  const handleImageFilesChange = (e) => {
+    const files = Array.from(e.target.files || [])
+    e.target.value = ''
+    const valid = []
+    for (const file of files) {
+      if (!file.type.startsWith('image/')) {
+        alert('Cada archivo debe ser una imagen (JPEG, PNG, WebP, etc.)')
+        continue
+      }
+      if (file.size > MAX_IMAGE_BYTES) {
+        alert(`"${file.name}" supera 5 MB`)
+        continue
+      }
+      valid.push(file)
+    }
+    if (valid.length === 0) return
+    setPendingImageFiles((prev) => [...prev, ...valid])
+  }
+
+  const handleRemovePendingImage = (index) => {
+    setPendingImageFiles((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const handlePdfFilesChange = (e) => {
+    const files = Array.from(e.target.files || [])
+    e.target.value = ''
+    const valid = []
+    for (const file of files) {
+      const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
+      if (!isPdf) {
+        alert(`"${file.name}" no es un PDF`)
+        continue
+      }
+      if (file.size > MAX_PDF_BYTES) {
+        alert(`"${file.name}" supera 12 MB`)
+        continue
+      }
+      valid.push(file)
+    }
+    if (valid.length === 0) return
+    setPendingPdfFiles((prev) => [...prev, ...valid])
+  }
+
+  const handleRemovePendingPdf = (index) => {
+    setPendingPdfFiles((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const handleAddSkill = () => {
+    const s = skillInput.trim()
+    if (!s) return
+    if (form.skills.includes(s)) {
+      setSkillInput('')
       return
     }
-    if (!file.type.startsWith('image/')) {
-      alert('El archivo debe ser una imagen (JPEG, PNG, WebP, etc.)')
-      e.target.value = ''
-      return
-    }
-    if (file.size > MAX_IMAGE_BYTES) {
-      alert('La imagen no debe superar 5 MB')
-      e.target.value = ''
-      return
-    }
-    setImageFile(file)
+    setForm((f) => ({ ...f, skills: [...f.skills, s] }))
+    setSkillInput('')
+  }
+
+  const handleRemoveSkill = (skill) => {
+    setForm((f) => ({ ...f, skills: f.skills.filter((x) => x !== skill) }))
+  }
+
+  const handleAddImageUrl = () => {
+    const u = imageUrlInput.trim()
+    if (!u) return
+    setForm((f) => ({ ...f, imageUrls: [...f.imageUrls, u] }))
+    setImageUrlInput('')
+  }
+
+  const handleRemoveImageUrl = (index) => {
+    setForm((f) => ({ ...f, imageUrls: f.imageUrls.filter((_, i) => i !== index) }))
+  }
+
+  const handleRemoveSavedPdf = (index) => {
+    setForm((f) => ({ ...f, pdfs: f.pdfs.filter((_, i) => i !== index) }))
   }
 
   const handleEdit = (row) => {
-    setImageFile(null)
+    setPendingImageFiles([])
+    setPendingPdfFiles([])
+    setSkillInput('')
+    setImageUrlInput('')
     setEditingId(row.id)
     setForm({
       title: row.title ?? '',
       description: row.description ?? '',
-      image: row.image ?? '',
-      gitUrl: row.gitUrl ?? '',
-      previewUrl: row.previewUrl ?? '',
+      skills: normalizeSkillsFromRow(row),
+      imageUrls: normalizeImagesFromRow(row),
+      executedAt: toDateInputValue(row.executedAt),
+      pdfs: normalizePdfsFromRow(row),
       sortOrder: Number(row.sortOrder ?? 0),
       active: row.active !== false,
     })
   }
 
   const handleNew = () => {
-    setImageFile(null)
+    setPendingImageFiles([])
+    setPendingPdfFiles([])
+    setSkillInput('')
+    setImageUrlInput('')
     setEditingId('new')
     setForm({ ...emptyForm })
   }
@@ -119,25 +218,60 @@ const ProjectsAdminClient = () => {
   const handleCancel = () => {
     setEditingId(null)
     setForm(emptyForm)
-    setImageFile(null)
+    setPendingImageFiles([])
+    setPendingPdfFiles([])
+    setSkillInput('')
+    setImageUrlInput('')
+  }
+
+  const uploadProjectImages = async (storage, projectId, files) => {
+    const urls = []
+    for (const file of files) {
+      const baseName = file.name.replace(/\.[^/.]+$/, '')
+      const rawExt = file.name.includes('.') ? file.name.split('.').pop().toLowerCase() : 'jpg'
+      const ext = /^[a-z0-9]{2,5}$/.test(rawExt || '') ? rawExt : 'jpg'
+      const safe = sanitizeStorageFileName(baseName)
+      const path = `portfolio-projects/${projectId}/images/${Date.now()}_${safe}.${ext}`
+      const storageRef = ref(storage, path)
+      await uploadBytes(storageRef, file, {
+        contentType: file.type || 'image/jpeg',
+      })
+      urls.push(await getDownloadURL(storageRef))
+    }
+    return urls
+  }
+
+  const uploadProjectPdfs = async (storage, projectId, files) => {
+    const out = []
+    for (const file of files) {
+      const safe = sanitizeStorageFileName(file.name.replace(/\.pdf$/i, ''))
+      const path = `portfolio-projects/${projectId}/pdfs/${Date.now()}_${safe}.pdf`
+      const storageRef = ref(storage, path)
+      await uploadBytes(storageRef, file, {
+        contentType: 'application/pdf',
+      })
+      const url = await getDownloadURL(storageRef)
+      out.push({ url, fileName: file.name })
+    }
+    return out
   }
 
   const handleSave = async (e) => {
     e.preventDefault()
     const db = getFirebaseFirestore()
     if (!db) return
-    let imageUrl = form.image.trim()
-    if (imageFile) {
+
+    const needsStorage =
+      pendingImageFiles.length > 0 || pendingPdfFiles.length > 0
+
+    if (needsStorage) {
       const storage = getFirebaseStorage()
       if (!storage) {
         alert('Configura NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET en .env.local y reinicia el servidor')
         return
       }
     }
-    if (!imageUrl && !imageFile) {
-      alert('Añade una imagen subiendo un archivo o pegando una URL')
-      return
-    }
+
     setSaving(true)
     try {
       const projectRef =
@@ -145,30 +279,39 @@ const ProjectsAdminClient = () => {
           ? doc(collection(db, COL.portfolioProjects))
           : doc(db, COL.portfolioProjects, editingId)
 
-      if (imageFile) {
-        const storage = getFirebaseStorage()
+      const storage = getFirebaseStorage()
+      let imageUrls = [...form.imageUrls.map((u) => u.trim()).filter(Boolean)]
+      let pdfs = [...form.pdfs]
+
+      if (pendingImageFiles.length > 0) {
         if (!storage) throw new Error('Storage no disponible')
-        const baseName = imageFile.name.replace(/\.[^/.]+$/, '')
-        const rawExt = imageFile.name.includes('.') ? imageFile.name.split('.').pop().toLowerCase() : 'jpg'
-        const ext = /^[a-z0-9]{2,5}$/.test(rawExt || '') ? rawExt : 'jpg'
-        const safe = sanitizeStorageFileName(baseName)
-        const path = `portfolio-projects/${projectRef.id}/${Date.now()}_${safe}.${ext}`
-        const storageRef = ref(storage, path)
-        await uploadBytes(storageRef, imageFile, {
-          contentType: imageFile.type || 'image/jpeg',
-        })
-        imageUrl = await getDownloadURL(storageRef)
+        const uploaded = await uploadProjectImages(storage, projectRef.id, pendingImageFiles)
+        imageUrls = [...imageUrls, ...uploaded]
       }
+
+      if (pendingPdfFiles.length > 0) {
+        if (!storage) throw new Error('Storage no disponible')
+        const uploadedPdfs = await uploadProjectPdfs(storage, projectRef.id, pendingPdfFiles)
+        pdfs = [...pdfs, ...uploadedPdfs]
+      }
+
+      const skills = form.skills.map((s) => s.trim()).filter(Boolean)
+      const executedRaw = form.executedAt.trim()
+      const executedAt = executedRaw === '' ? null : executedRaw
 
       const payload = {
         title: form.title.trim(),
         description: form.description.trim(),
-        image: imageUrl,
-        gitUrl: form.gitUrl.trim(),
-        previewUrl: form.previewUrl.trim(),
+        images: imageUrls,
+        skills,
+        executedAt,
+        pdfs,
         sortOrder: Number(form.sortOrder) || 0,
         active: Boolean(form.active),
         updatedAt: serverTimestamp(),
+        gitUrl: deleteField(),
+        previewUrl: deleteField(),
+        image: deleteField(),
       }
 
       if (editingId === 'new') {
@@ -179,6 +322,7 @@ const ProjectsAdminClient = () => {
       } else if (editingId) {
         await updateDoc(projectRef, payload)
       }
+
       handleCancel()
       await load()
     } catch (err) {
@@ -218,6 +362,13 @@ const ProjectsAdminClient = () => {
     }
   }
 
+  const handleSkillKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleAddSkill()
+    }
+  }
+
   return (
     <div className="mx-auto max-w-6xl">
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -235,14 +386,12 @@ const ProjectsAdminClient = () => {
       </div>
 
       {editingId ? (
-        <form
-          onSubmit={handleSave}
-          className={`mb-10 space-y-4 p-6 ${liquidGlassPanel}`}
-        >
+        <form onSubmit={handleSave} className={`mb-10 space-y-4 p-6 ${liquidGlassPanel}`}>
           <h2 className="text-lg font-semibold">{editingId === 'new' ? 'Crear proyecto' : 'Editar proyecto'}</h2>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-xs text-[#8b949e]">Título</label>
+              <label className="mb-1 block text-xs text-[#8b949e]">Título del proyecto</label>
               <input
                 required
                 value={form.title}
@@ -250,75 +399,169 @@ const ProjectsAdminClient = () => {
                 className="w-full rounded-lg border border-surface-border bg-page px-3 py-2 text-sm text-white focus:border-accent-orange/50 focus:outline-none focus:ring-2 focus:ring-accent-orange/20"
               />
             </div>
+
             <div className="sm:col-span-2">
               <label className="mb-1 block text-xs text-[#8b949e]">Descripción</label>
               <textarea
                 required
-                rows={3}
+                rows={4}
                 value={form.description}
                 onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                 className="w-full rounded-lg border border-surface-border bg-page px-3 py-2 text-sm text-white focus:border-accent-orange/50 focus:outline-none focus:ring-2 focus:ring-accent-orange/20"
               />
             </div>
-            <div className="sm:col-span-2 space-y-3">
-              <div>
-                <label htmlFor="project-image-file" className="mb-1 block text-xs text-[#8b949e]">
-                  Subir imagen (Firebase Storage, máx. 5 MB)
-                </label>
+
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-xs text-[#8b949e]">Habilidades aplicadas</label>
+              <div className="flex flex-wrap gap-2">
                 <input
-                  id="project-image-file"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
-                  onChange={handleImageFileChange}
-                  className="w-full cursor-pointer rounded-lg border border-dashed border-white/20 bg-page/50 px-3 py-2 text-sm text-[#c9d1d9] file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-accent-orange/20 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent-orange hover:border-white/30"
+                  value={skillInput}
+                  onChange={(e) => setSkillInput(e.target.value)}
+                  onKeyDown={handleSkillKeyDown}
+                  placeholder="Ej. Next.js"
+                  className="min-w-[12rem] flex-1 rounded-lg border border-surface-border bg-page px-3 py-2 text-sm text-white focus:border-accent-orange/50 focus:outline-none focus:ring-2 focus:ring-accent-orange/20"
                 />
-                {imageFile ? (
-                  <button
-                    type="button"
-                    onClick={() => setImageFile(null)}
-                    className="mt-2 text-xs text-red-300 hover:underline"
-                  >
-                    Quitar archivo seleccionado
-                  </button>
-                ) : null}
+                <button
+                  type="button"
+                  onClick={handleAddSkill}
+                  className="rounded-lg border border-accent-orange/40 bg-accent-orange/15 px-3 py-2 text-sm font-medium text-accent-orange hover:bg-accent-orange/25"
+                >
+                  Añadir
+                </button>
               </div>
-              {(imagePreviewUrl || form.image) ? (
-                <div className="overflow-hidden rounded-xl border border-white/10 bg-black/20">
-                  <img
-                    src={imagePreviewUrl || form.image}
-                    alt=""
-                    className="h-40 w-full object-cover sm:h-48"
-                  />
+              {form.skills.length > 0 ? (
+                <ul className="mt-3 flex flex-wrap gap-2" aria-label="Habilidades añadidas">
+                  {form.skills.map((skill) => (
+                    <li
+                      key={skill}
+                      className="inline-flex items-center gap-1 rounded-full border border-accent-orange/30 bg-accent-orange/10 px-2.5 py-0.5 text-xs font-medium text-accent-orange"
+                    >
+                      {skill}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSkill(skill)}
+                        className="ml-0.5 rounded p-0.5 text-accent-orange/80 hover:bg-accent-orange/20 hover:text-accent-orange"
+                        aria-label={`Quitar ${skill}`}
+                      >
+                        ×
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-xs text-[#8b949e]">Aparecerán como etiquetas en la tarjeta pública</p>
+              )}
+            </div>
+
+            <div className="sm:col-span-2 space-y-3">
+              <label className="block text-xs text-[#8b949e]">Imágenes (opcional)</label>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+                multiple
+                onChange={handleImageFilesChange}
+                className="w-full cursor-pointer rounded-lg border border-dashed border-white/20 bg-page/50 px-3 py-2 text-sm text-[#c9d1d9] file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-accent-orange/20 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-accent-orange hover:border-white/30"
+              />
+              <div className="flex flex-wrap gap-2">
+                <input
+                  value={imageUrlInput}
+                  onChange={(e) => setImageUrlInput(e.target.value)}
+                  placeholder="O pegar URL de imagen"
+                  className="min-w-[12rem] flex-1 rounded-lg border border-surface-border bg-page px-3 py-2 text-sm text-white focus:border-accent-orange/50 focus:outline-none focus:ring-2 focus:ring-accent-orange/20"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddImageUrl}
+                  className="rounded-lg border border-white/15 px-3 py-2 text-sm text-[#c9d1d9] hover:bg-white/5"
+                >
+                  Añadir URL
+                </button>
+              </div>
+              {form.imageUrls.length > 0 || pendingImagePreviews.length > 0 ? (
+                <div className="flex flex-wrap gap-3">
+                  {form.imageUrls.map((url, i) => (
+                    <div key={`url-${i}`} className="relative overflow-hidden rounded-lg border border-white/10">
+                      <img src={url} alt="" className="h-24 w-36 object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImageUrl(i)}
+                        className="absolute right-1 top-1 rounded bg-black/60 px-1.5 text-xs text-white hover:bg-black/80"
+                        aria-label="Quitar imagen"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                  {pendingImagePreviews.map((src, i) => (
+                    <div key={`pending-${i}`} className="relative overflow-hidden rounded-lg border border-dashed border-accent-orange/40">
+                      <img src={src} alt="" className="h-24 w-36 object-cover opacity-90" />
+                      <button
+                        type="button"
+                        onClick={() => handleRemovePendingImage(i)}
+                        className="absolute right-1 top-1 rounded bg-black/60 px-1.5 text-xs text-white hover:bg-black/80"
+                        aria-label="Quitar archivo pendiente"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
                 </div>
               ) : null}
-              <div>
-                <label className="mb-1 block text-xs text-[#8b949e]">
-                  O URL de imagen (opcional si subes un archivo · ej. /static/... o enlace público)
-                </label>
-                <input
-                  value={form.image}
-                  onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
-                  placeholder="https://… o /static/images/mi-proyecto.png"
-                  className="w-full rounded-lg border border-surface-border bg-page px-3 py-2 text-sm text-white focus:border-accent-orange/50 focus:outline-none focus:ring-2 focus:ring-accent-orange/20"
-                />
-              </div>
             </div>
+
             <div>
-              <label className="mb-1 block text-xs text-[#8b949e]">Repo / código (URL)</label>
+              <label className="mb-1 block text-xs text-[#8b949e]">Fecha de ejecución (opcional)</label>
               <input
-                value={form.gitUrl}
-                onChange={(e) => setForm((f) => ({ ...f, gitUrl: e.target.value }))}
+                type="date"
+                value={form.executedAt}
+                onChange={(e) => setForm((f) => ({ ...f, executedAt: e.target.value }))}
                 className="w-full rounded-lg border border-surface-border bg-page px-3 py-2 text-sm text-white focus:border-accent-orange/50 focus:outline-none focus:ring-2 focus:ring-accent-orange/20"
               />
             </div>
-            <div>
-              <label className="mb-1 block text-xs text-[#8b949e]">Demo / preview (URL)</label>
+
+            <div className="sm:col-span-2 space-y-2">
+              <label className="block text-xs text-[#8b949e]">Archivos PDF (opcional)</label>
               <input
-                value={form.previewUrl}
-                onChange={(e) => setForm((f) => ({ ...f, previewUrl: e.target.value }))}
-                className="w-full rounded-lg border border-surface-border bg-page px-3 py-2 text-sm text-white focus:border-accent-orange/50 focus:outline-none focus:ring-2 focus:ring-accent-orange/20"
+                type="file"
+                accept="application/pdf,.pdf"
+                multiple
+                onChange={handlePdfFilesChange}
+                className="w-full cursor-pointer rounded-lg border border-dashed border-white/20 bg-page/50 px-3 py-2 text-sm text-[#c9d1d9] file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-accent-orange/20 file:px-3 file:py-1.5 file:text-sm file:text-accent-orange hover:border-white/30"
               />
+              {form.pdfs.length > 0 ? (
+                <ul className="space-y-1 text-sm text-[#c9d1d9]">
+                  {form.pdfs.map((p, i) => (
+                    <li key={`pdf-saved-${i}`} className="flex items-center justify-between gap-2 rounded border border-white/[0.06] bg-page/40 px-2 py-1">
+                      <span className="truncate">{p.fileName || 'PDF'}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSavedPdf(i)}
+                        className="shrink-0 text-xs text-red-300 hover:underline"
+                      >
+                        Quitar
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              {pendingPdfFiles.length > 0 ? (
+                <ul className="space-y-1 text-sm text-[#8b949e]">
+                  {pendingPdfFiles.map((f, i) => (
+                    <li key={`pdf-pend-${i}`} className="flex items-center justify-between gap-2">
+                      <span className="truncate">Subir: {f.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemovePendingPdf(i)}
+                        className="shrink-0 text-xs text-red-300 hover:underline"
+                      >
+                        Quitar
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
+
             <div>
               <label className="mb-1 block text-xs text-[#8b949e]">Orden</label>
               <input
@@ -341,6 +584,7 @@ const ProjectsAdminClient = () => {
               </label>
             </div>
           </div>
+
           <div className="flex gap-2 pt-2">
             <button
               type="submit"

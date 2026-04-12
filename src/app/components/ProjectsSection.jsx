@@ -19,6 +19,32 @@ const ensureFirebase = async () => {
   }
 }
 
+const mapProjectDoc = (id, x) => {
+  const images = Array.isArray(x.images) && x.images.length > 0
+    ? x.images.filter((u) => typeof u === 'string' && u.trim())
+    : x.image && typeof x.image === 'string' && x.image.trim()
+      ? [x.image.trim()]
+      : []
+
+  const skills = Array.isArray(x.skills)
+    ? x.skills.map((s) => String(s).trim()).filter(Boolean)
+    : []
+
+  const pdfs = Array.isArray(x.pdfs)
+    ? x.pdfs.filter((p) => p && typeof p.url === 'string' && p.url.trim())
+    : []
+
+  return {
+    id,
+    title: x.title,
+    description: x.description,
+    images,
+    skills,
+    executedAt: x.executedAt ?? null,
+    pdfs,
+  }
+}
+
 const ProjectsSection = () => {
   /** null = cargando, array = ya cargado (puede estar vacío) */
   const [projects, setProjects] = useState(null)
@@ -43,17 +69,7 @@ const ProjectsSection = () => {
           orderBy('sortOrder', 'asc')
         )
         const snap = await getDocs(q)
-        const list = snap.docs.map((d) => {
-          const x = d.data()
-          return {
-            id: d.id,
-            title: x.title,
-            description: x.description,
-            image: x.image,
-            gitUrl: x.gitUrl ?? '',
-            previewUrl: x.previewUrl ?? '',
-          }
-        })
+        const list = snap.docs.map((d) => mapProjectDoc(d.id, d.data()))
         if (alive) setProjects(list)
       } catch (e) {
         console.warn('Firestore proyectos:', e)
@@ -84,9 +100,10 @@ const ProjectsSection = () => {
               key={project.id}
               title={project.title}
               description={project.description}
-              imgUrl={project.image}
-              gitUrl={project.gitUrl}
-              previewUrl={project.previewUrl}
+              images={project.images}
+              skills={project.skills}
+              executedAt={project.executedAt}
+              pdfs={project.pdfs}
             />
           ))}
         </div>

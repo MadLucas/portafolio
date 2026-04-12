@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import NavLink from './NavLink'
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid"
 import MenuOverlay from './MenuOverlay'
 
 const navLinks = [
@@ -24,9 +23,46 @@ const pillSurface = `rounded-full ${pillGlass}`
 
 const pillMobilePanel = `rounded-2xl ${pillGlass}`
 
-/** Mismo botón hamburguesa en top y en pill (sin anillo naranja al foco) */
-const menuButtonClasses =
-  'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/18 bg-white/[0.06] text-slate-200 transition duration-200 hover:border-white/28 hover:bg-white/[0.10] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/25 focus-visible:ring-offset-2 focus-visible:ring-offset-page md:hidden'
+/** Transición “líquida” solo en el icono del botón */
+const menuIconEase =
+  'duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none motion-reduce:duration-150'
+
+const menuButtonBase =
+  'group relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border text-slate-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/25 focus-visible:ring-offset-2 focus-visible:ring-offset-page md:hidden'
+
+const menuButtonIdle =
+  'border-white/18 bg-white/[0.06] shadow-none transition-[border-color,background-color,box-shadow,transform] duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:border-white/28 hover:bg-white/[0.10] hover:text-white'
+
+const menuButtonOpenGlass =
+  'border-white/40 bg-white/[0.11] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.18),0_0_0_1px_rgba(255,255,255,0.06),0_6px_20px_rgba(0,0,0,0.35)] scale-[1.02]'
+
+const MobileMenuToggleButton = ({ open, onClick, controlsId }) => {
+  /** Caja 11×11px, trazos 0.5px → huecos más estrechos; distancia entre centros = (11 − 0.5) / 2 = 5.25px */
+  const bar = `absolute left-1/2 top-1/2 block h-[0.5px] w-[10px] -translate-x-1/2 origin-center rounded-full bg-white ${menuIconEase}`
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`${menuButtonBase} ${menuButtonIdle} ${open ? menuButtonOpenGlass : ''}`}
+      aria-expanded={open}
+      aria-controls={controlsId}
+      aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
+    >
+      <span className="relative mx-auto block h-[11px] w-[11px]" aria-hidden>
+        <span
+          className={`${bar} ${open ? '-translate-y-1/2 rotate-45' : 'translate-y-[calc(-50%-5.25px)]'}`}
+        />
+        <span
+          className={`${bar} ${open ? '-translate-y-1/2 scale-x-0 opacity-0' : '-translate-y-1/2 scale-x-100 opacity-100'}`}
+        />
+        <span
+          className={`${bar} ${open ? '-translate-y-1/2 -rotate-45' : 'translate-y-[calc(-50%+5.25px)]'}`}
+        />
+      </span>
+    </button>
+  )
+}
 
 const Navbar = () => {
   const [navbarOpen, setNavbarOpen] = useState(false)
@@ -82,20 +118,11 @@ const Navbar = () => {
   )
 
   const menuButton = (
-    <button
-      type="button"
+    <MobileMenuToggleButton
+      open={navbarOpen}
       onClick={handleToggleMenu}
-      className={menuButtonClasses}
-      aria-expanded={navbarOpen}
-      aria-controls="mobile-menu-nav"
-      aria-label={navbarOpen ? 'Cerrar menú' : 'Abrir menú'}
-    >
-      {navbarOpen ? (
-        <XMarkIcon className="h-5 w-5 transition-transform duration-200" />
-      ) : (
-        <Bars3Icon className="h-5 w-5 transition-transform duration-200" />
-      )}
-    </button>
+      controlsId="mobile-menu-nav"
+    />
   )
 
   const mobileDropdown = navbarOpen ? (
