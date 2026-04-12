@@ -9,7 +9,6 @@ export const metadata = {
   description:
     "Portafolio de Lucas Fernández: desarrollo web fullstack, proyectos y contacto.",
   icons: {
-    icon: [{ url: "/Lucas.jpg", type: "image/jpeg" }],
     apple: [{ url: "/Lucas.jpg", type: "image/jpeg" }],
   },
 }
