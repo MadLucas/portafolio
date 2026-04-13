@@ -5,6 +5,7 @@ import { collection, getDocs, orderBy, query, where } from 'firebase/firestore'
 import { getFirebaseFirestore, getFirebaseApp, initFirebaseAppFromPublicConfig } from '../../lib/firebase/client'
 import { COL } from '../../lib/firebase/collections'
 import ProjectsCard from './ProjectsCard'
+import ProjectDetailModal from './ProjectDetailModal'
 
 const ensureFirebase = async () => {
   if (getFirebaseApp()) return true
@@ -48,6 +49,7 @@ const mapProjectDoc = (id, x) => {
 const ProjectsSection = () => {
   /** null = cargando, array = ya cargado (puede estar vacío) */
   const [projects, setProjects] = useState(null)
+  const [selectedProject, setSelectedProject] = useState(null)
 
   useEffect(() => {
     let alive = true
@@ -104,10 +106,16 @@ const ProjectsSection = () => {
               skills={project.skills}
               executedAt={project.executedAt}
               pdfs={project.pdfs}
+              onOpen={() => setSelectedProject(project)}
             />
           ))}
         </div>
       ) : null}
+
+      <ProjectDetailModal
+        project={selectedProject}
+        onClose={() => setSelectedProject(null)}
+      />
     </section>
   )
 }

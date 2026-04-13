@@ -7,10 +7,10 @@ import NavLink from './NavLink'
 import MenuOverlay from './MenuOverlay'
 
 const navLinks = [
-  { title: "About", path: "#about" },
-  { title: "Proyectos", path: "#proyectos" },
+  { title: "About", path: "/#about" },
+  { title: "Proyectos", path: "/#proyectos" },
   { title: "Blog", path: "/blog" },
-  { title: "Contacto", path: "#contacto" },
+  { title: "Contacto", path: "/#contacto" },
 ]
 
 const SCROLL_THRESHOLD = 80

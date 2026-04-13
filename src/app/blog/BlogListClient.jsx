@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { TypeAnimation } from 'react-type-animation'
 import { collection, getDocs, query, where } from 'firebase/firestore'
 import { getFirebaseFirestore, getFirebaseApp, initFirebaseAppFromPublicConfig } from '../../lib/firebase/client'
 import { COL } from '../../lib/firebase/collections'
@@ -15,6 +16,19 @@ const updatedAtToMillis = (t) => {
   if (typeof t.seconds === 'number') return t.seconds * 1000
   return 0
 }
+
+const BLOG_HEADLINE_PARTS = ['Tecnología', 'Ocio', 'Casos de éxito']
+
+const longestBlogAnimated = BLOG_HEADLINE_PARTS.reduce((a, b) => (a.length >= b.length ? a : b))
+
+const BLOG_TYPE_SEQUENCE = [
+  BLOG_HEADLINE_PARTS[0],
+  1200,
+  BLOG_HEADLINE_PARTS[1],
+  1200,
+  BLOG_HEADLINE_PARTS[2],
+  1200,
+]
 
 const ensureFirebase = async () => {
   if (getFirebaseApp()) return true
@@ -106,8 +120,32 @@ const BlogListClient = () => {
       <div className="pointer-events-none fixed inset-0 -z-10 bg-hero-glow opacity-90" aria-hidden />
       <Navbar />
       <div className="container relative mx-auto max-w-3xl px-4 pb-20 pt-24 text-white sm:px-6 sm:pt-28">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Blog</h1>
-        <p className="mt-2 text-sm text-[#8b949e]">Publicaciones activas del portafolio.</p>
+        <h1 className="mb-2 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl lg:leading-[1.15]">
+          <span className="relative isolate block w-full min-h-[2.75lh] sm:min-h-[2.25lh]">
+            <span className="invisible block w-full select-none" aria-hidden="true">
+              <span className="bg-gradient-to-r from-accent-orange via-accent-coral to-accent-rose bg-clip-text text-transparent">
+                Bienvenido a mi blog,{' '}
+              </span>
+              <span className="text-white">{longestBlogAnimated}</span>
+            </span>
+            <span className="absolute left-0 top-0 z-10 block w-full">
+              <span className="bg-gradient-to-r from-accent-orange via-accent-coral to-accent-rose bg-clip-text text-transparent">
+                Bienvenido a mi blog,{' '}
+              </span>
+              <span className="text-white">
+                <TypeAnimation
+                  sequence={BLOG_TYPE_SEQUENCE}
+                  wrapper="span"
+                  speed={45}
+                  repeat={Infinity}
+                  cursor={false}
+                  omitDeletionAnimation
+                />
+              </span>
+            </span>
+          </span>
+        </h1>
+        <p className="mt-3 text-sm text-[#8b949e]">Publicaciones activas del portafolio.</p>
 
         {!loading && !error ? (
           <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end">

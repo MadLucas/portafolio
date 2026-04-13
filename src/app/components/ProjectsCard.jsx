@@ -30,7 +30,16 @@ const formatExecutedAt = (raw) => {
   }
 }
 
-const ProjectsCard = ({ title, description, images = [], legacyImage, skills = [], executedAt, pdfs = [] }) => {
+const ProjectsCard = ({
+  title,
+  description,
+  images = [],
+  legacyImage,
+  skills = [],
+  executedAt,
+  pdfs = [],
+  onOpen,
+}) => {
   const gallery = useMemo(() => {
     const list = Array.isArray(images) && images.length > 0 ? images : legacyImage ? [legacyImage] : []
     return list.map((u) => resolveImgUrl(u)).filter(Boolean)
@@ -42,8 +51,27 @@ const ProjectsCard = ({ title, description, images = [], legacyImage, skills = [
   const safeSkills = Array.isArray(skills) ? skills.filter(Boolean) : []
   const safePdfs = Array.isArray(pdfs) ? pdfs.filter((p) => p?.url) : []
 
+  const handleCardActivate = () => {
+    if (typeof onOpen === 'function') onOpen()
+  }
+
+  const handleCardKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      handleCardActivate()
+    }
+  }
+
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-surface-elevated/40 shadow-card ring-1 ring-white/[0.04] transition hover:border-white/[0.1] hover:shadow-glow">
+    <article
+      className={`group flex flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-surface-elevated/40 shadow-card ring-1 ring-white/[0.04] transition hover:border-white/[0.1] hover:shadow-glow ${
+        onOpen ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-orange/40 focus-visible:ring-offset-2 focus-visible:ring-offset-page' : ''
+      }`}
+      onClick={onOpen ? handleCardActivate : undefined}
+      onKeyDown={onOpen ? handleCardKeyDown : undefined}
+      tabIndex={onOpen ? 0 : undefined}
+      aria-label={onOpen ? `Ver detalle: ${title}` : undefined}
+    >
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-gradient-to-br from-accent-orange/15 via-page to-surface md:aspect-[16/9]">
         {heroUrl ? (
           <Image
@@ -65,7 +93,10 @@ const ProjectsCard = ({ title, description, images = [], legacyImage, skills = [
               <button
                 key={i}
                 type="button"
-                onClick={() => setHeroIndex(i)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setHeroIndex(i)
+                }}
                 className={`h-1.5 rounded-full transition ${
                   i === heroIndex ? 'w-6 bg-accent-orange' : 'w-1.5 bg-white/35 hover:bg-white/55'
                 }`}
@@ -109,6 +140,7 @@ const ProjectsCard = ({ title, description, images = [], legacyImage, skills = [
                   href={p.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
                   className="inline-flex items-center gap-2 text-sm text-accent-orange/90 transition hover:text-accent-orange"
                 >
                   <DocumentTextIcon className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
