@@ -315,10 +315,15 @@ const ProjectsAdminClient = () => {
       }
 
       if (editingId === 'new') {
-        await setDoc(projectRef, {
-          ...payload,
-          createdAt: serverTimestamp(),
-        })
+        // deleteField() en setDoc exige { merge: true } (Firestore)
+        await setDoc(
+          projectRef,
+          {
+            ...payload,
+            createdAt: serverTimestamp(),
+          },
+          { merge: true }
+        )
       } else if (editingId) {
         await updateDoc(projectRef, payload)
       }
