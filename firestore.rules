@@ -11,6 +11,11 @@ service cloud.firestore {
       allow create, update, delete: if request.auth != null;
     }
 
+    match /softwareSolutions/{id} {
+      allow read: if resource.data.active == true || request.auth != null;
+      allow create, update, delete: if request.auth != null;
+    }
+
     match /blogPosts/{postId} {
       allow read: if resource.data.active == true || request.auth != null;
       allow create, update, delete: if request.auth != null;

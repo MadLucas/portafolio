@@ -8,6 +8,7 @@ import {
   FolderIcon,
   DocumentTextIcon,
   ClipboardDocumentListIcon,
+  CpuChipIcon,
   ChevronRightIcon,
   ChevronLeftIcon,
   PowerIcon,
@@ -20,6 +21,7 @@ const EXPANDED_W = '14.5rem'
 const items = [
   { href: '/admin', label: 'Dashboard', Icon: ChartBarIcon },
   { href: '/admin/proyectos', label: 'Proyectos', Icon: FolderIcon },
+  { href: '/admin/soluciones', label: 'Soluciones', Icon: CpuChipIcon },
   { href: '/admin/blog', label: 'Blog', Icon: DocumentTextIcon },
   { href: '/admin/encuestas', label: 'Encuestas', Icon: ClipboardDocumentListIcon },
 ]

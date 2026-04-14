@@ -11,11 +11,13 @@ const getResend = () => {
 const fromEmail = process.env.FROM_EMAIL
 const toEmail = process.env.TO_EMAIL
 
-const ContactEmail = ({ subject, message, email }) => (
+const ContactEmail = ({ subject, message, email, source }) => (
   <>
     <h1 style={{ fontSize: '1.25rem', marginBottom: '0.75rem' }}>{subject}</h1>
     <p style={{ whiteSpace: 'pre-wrap', marginBottom: '1rem' }}>{message}</p>
-    <p style={{ color: '#666', fontSize: '0.875rem' }}>Nuevo mensaje desde el portafolio</p>
+    <p style={{ color: '#666', fontSize: '0.875rem' }}>
+      {source ? `Origen: ${source}` : 'Nuevo mensaje desde el portafolio'}
+    </p>
     <p style={{ marginTop: '0.5rem' }}>
       <strong>De:</strong> {email}
     </p>
@@ -38,7 +40,7 @@ export async function POST(req) {
     return NextResponse.json({ error: { message: 'JSON inválido' } }, { status: 400 })
   }
 
-  const { email, subject, message } = body
+  const { email, subject, message, source } = body
 
   if (
     typeof email !== 'string' ||
@@ -54,6 +56,11 @@ export async function POST(req) {
     )
   }
 
+  let sourceLabel = ''
+  if (source != null && typeof source === 'string' && source.trim()) {
+    sourceLabel = source.trim().slice(0, 100)
+  }
+
   if (subject.length > 200 || message.length > 8000) {
     return NextResponse.json(
       { error: { message: 'Asunto o mensaje demasiado largo.' } },
@@ -61,12 +68,23 @@ export async function POST(req) {
     )
   }
 
+  const inboxSubject = sourceLabel
+    ? `Contacto portafolio [${sourceLabel}]: ${subject}`
+    : `Contacto portafolio: ${subject}`
+
   try {
     const data = await resend.emails.send({
       from: fromEmail,
       to: [toEmail],
-      subject: `Contacto portafolio: ${subject}`,
-      react: <ContactEmail subject={subject} message={message} email={email} />,
+      subject: inboxSubject,
+      react: (
+        <ContactEmail
+          subject={subject}
+          message={message}
+          email={email}
+          source={sourceLabel || undefined}
+        />
+      ),
     })
 
     return NextResponse.json(data)

@@ -4,6 +4,7 @@ export const COL = {
   blogPosts: 'blogPosts',
   surveys: 'surveys',
   surveyResponses: 'responses',
+  softwareSolutions: 'softwareSolutions',
 }
 
 /** Subcolecciones bajo `blogPosts/{postId}` */
