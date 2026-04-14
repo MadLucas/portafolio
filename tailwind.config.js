@@ -45,10 +45,30 @@ module.exports = {
           "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        "contact-feedback-in": {
+          "0%": { opacity: "0", transform: "translateY(14px) scale(0.94)" },
+          "55%": { opacity: "1", transform: "translateY(-3px) scale(1.02)" },
+          "100%": { opacity: "1", transform: "translateY(0) scale(1)" },
+        },
+        "contact-float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-6px)" },
+        },
+        "contact-shake": {
+          "0%, 100%": { transform: "translateX(0)" },
+          "20%": { transform: "translateX(-5px)" },
+          "40%": { transform: "translateX(5px)" },
+          "60%": { transform: "translateX(-3px)" },
+          "80%": { transform: "translateX(3px)" },
+        },
       },
       animation: {
         "nav-dropdown": "nav-dropdown 0.34s cubic-bezier(0.16, 1, 0.3, 1) both",
         "nav-link-in": "nav-link-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both",
+        "contact-feedback-in":
+          "contact-feedback-in 0.65s cubic-bezier(0.22, 1, 0.36, 1) both",
+        "contact-float": "contact-float 2.2s ease-in-out infinite",
+        "contact-shake": "contact-shake 0.45s ease-in-out both",
       },
     },
   },
