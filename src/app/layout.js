@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google"
 import "./globals.css"
 import PageViewTracker from "./components/analytics/PageViewTracker"
+import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -19,6 +20,7 @@ export default function RootLayout({ children }) {
       <body className={`${inter.className} antialiased`}>
         <PageViewTracker />
         {children}
+        <Analytics />
       </body>
     </html>
   )
