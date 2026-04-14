@@ -46,10 +46,13 @@ const mapProjectDoc = (id, x) => {
   }
 }
 
+const PREVIEW_PROJECT_COUNT = 3
+
 const ProjectsSection = () => {
   /** null = cargando, array = ya cargado (puede estar vacío) */
   const [projects, setProjects] = useState(null)
   const [selectedProject, setSelectedProject] = useState(null)
+  const [showAllProjects, setShowAllProjects] = useState(false)
 
   useEffect(() => {
     let alive = true
@@ -83,6 +86,17 @@ const ProjectsSection = () => {
     }
   }, [])
 
+  const visibleProjects =
+    projects && projects.length > PREVIEW_PROJECT_COUNT && !showAllProjects
+      ? projects.slice(0, PREVIEW_PROJECT_COUNT)
+      : projects ?? []
+
+  const hasMoreProjects = projects && projects.length > PREVIEW_PROJECT_COUNT
+
+  const handleToggleShowAll = () => {
+    setShowAllProjects((prev) => !prev)
+  }
+
   return (
     <section className="relative border-t border-white/[0.06] py-16 sm:py-20" id="proyectos">
       <h2 className="mb-12 text-center text-3xl font-bold tracking-tight text-white sm:text-4xl">
@@ -96,20 +110,34 @@ const ProjectsSection = () => {
       ) : null}
 
       {projects && projects.length > 0 ? (
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-10">
-          {projects.map((project) => (
-            <ProjectsCard
-              key={project.id}
-              title={project.title}
-              description={project.description}
-              images={project.images}
-              skills={project.skills}
-              executedAt={project.executedAt}
-              pdfs={project.pdfs}
-              onOpen={() => setSelectedProject(project)}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-10">
+            {visibleProjects.map((project) => (
+              <ProjectsCard
+                key={project.id}
+                title={project.title}
+                description={project.description}
+                images={project.images}
+                skills={project.skills}
+                executedAt={project.executedAt}
+                pdfs={project.pdfs}
+                onOpen={() => setSelectedProject(project)}
+              />
+            ))}
+          </div>
+          {hasMoreProjects ? (
+            <div className="mt-10 flex justify-center">
+              <button
+                type="button"
+                onClick={handleToggleShowAll}
+                className="rounded-full border border-white/18 bg-white/[0.06] px-6 py-2.5 text-sm font-semibold text-white transition hover:border-accent-orange/40 hover:bg-accent-orange/10 hover:text-accent-orange focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-orange/50 focus-visible:ring-offset-2 focus-visible:ring-offset-page"
+                aria-expanded={showAllProjects}
+              >
+                {showAllProjects ? 'Ver menos' : 'Ver más'}
+              </button>
+            </div>
+          ) : null}
+        </>
       ) : null}
 
       <ProjectDetailModal

@@ -52,7 +52,7 @@ const EmailSection = () => {
           </h2>
           <p className="mb-6 max-w-md text-[#8b949e]">
             Estoy abierto a nuevas oportunidades. Si tienes una pregunta o quieres saludar,
-            responderé cuando pueda.
+            responderé lo antes posible.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link

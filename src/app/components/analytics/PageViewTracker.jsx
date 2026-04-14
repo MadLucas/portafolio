@@ -1,7 +1,10 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
+
+/** Una sola cuenta por pestaña hasta cerrarla (navegar A→B no suma de nuevo) */
+const SESSION_KEY = 'portfolio_analytics_session'
 
 const shouldTrack = (pathname) => {
   if (!pathname) return false
@@ -12,12 +15,18 @@ const shouldTrack = (pathname) => {
 
 const PageViewTracker = () => {
   const pathname = usePathname()
-  const lastPath = useRef(null)
 
   useEffect(() => {
     if (!shouldTrack(pathname)) return
-    if (lastPath.current === pathname) return
-    lastPath.current = pathname
+    if (typeof window === 'undefined') return
+
+    try {
+      if (sessionStorage.getItem(SESSION_KEY)) return
+      /** Marca ya antes del fetch: evita doble POST en React Strict Mode y no reintenta en cada ruta */
+      sessionStorage.setItem(SESSION_KEY, '1')
+    } catch {
+      return
+    }
 
     fetch('/api/analytics/track', { method: 'POST', keepalive: true }).catch(() => {})
   }, [pathname])
