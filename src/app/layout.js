@@ -1,6 +1,8 @@
 import { Inter } from "next/font/google"
 import "./globals.css"
 import PageViewTracker from "./components/analytics/PageViewTracker"
+import { Analytics } from "@vercel/analytics/next"
+
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -18,6 +20,7 @@ export default function RootLayout({ children }) {
     <html lang="es" className="scroll-smooth">
       <body className={`${inter.className} antialiased`}>
         <PageViewTracker />
+        <Analytics />
         {children}
       </body>
     </html>
