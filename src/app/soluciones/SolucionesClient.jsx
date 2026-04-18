@@ -118,9 +118,8 @@ const SolucionesClient = () => {
             Soluciones y servicios
           </h1>
           <p className="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-[#8b949e] sm:text-lg">
-            Lo que tú, como profesional o empresa, necesitas, nosotros lo creamos. Con más de 3 años de
-            experiencia en la industria del desarrollo de software, tenemos el know-how para entregar la mejor
-            solución del mercado, hecho a la medida.
+          Sitios web para negocios que quieren crecer
+          o pymes, empresas y profesionales que quieren tener presencia online o incorporar tecnologia a sus procesos. {' '}
           </p>
         </header>
 

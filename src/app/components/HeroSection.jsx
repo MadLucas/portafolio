@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { TypeAnimation } from 'react-type-animation'
 
 /** Cadenas del typewriter (sin tiempos). La más larga define el cajón fijo y evita saltos de layout */
@@ -46,20 +47,16 @@ const HeroSection = () => {
             </span>
           </h1>
           <p className="mb-8 max-w-xl text-pretty text-base leading-relaxed text-white/85 sm:text-lg">
-            Bienvenidos a mi sitio web. Soy{' '}
-            <span className="bg-gradient-to-r from-accent-orange to-accent-coral bg-clip-text font-medium text-transparent">
-              Lucas
-            </span>
-            , desarrollador web fullstack. Aquí encontrarás proyectos recientes y
-            un poco de mi trayectoria. Me enfoco en experiencias digitales claras,
-            accesibles y con impacto real.
+          ¿Tu negocio no tiene web, o tiene una que ya no funciona?
+          Creo sitios web para negocios y profesionales. Rápidos, modernos y listos para conseguirte más clientes.{' '}
+
           </p>
-          <button
-            type="button"
-            className="rounded-full bg-gradient-to-br from-accent-orange via-accent-coral to-accent-rose px-7 py-3 text-sm font-semibold text-white shadow-glow transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-accent-orange/50 focus:ring-offset-2 focus:ring-offset-page sm:w-fit"
+          <Link
+            href="/#contacto"
+            className="inline-flex items-center justify-center rounded-full bg-gradient-to-br from-accent-orange via-accent-coral to-accent-rose px-7 py-3 text-sm font-semibold text-white shadow-glow transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-accent-orange/50 focus:ring-offset-2 focus:ring-offset-page sm:w-fit"
           >
-            Open to work!
-          </button>
+            Contactame!
+          </Link>
         </div>
         <div className="flex justify-center lg:col-span-5 lg:justify-end">
           <div className="relative">

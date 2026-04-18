@@ -59,8 +59,8 @@ const AboutSection = () => {
             <p className="text-base leading-relaxed text-[#c9d1d9] md:text-lg">
               Soy un desarrollador fullstack apasionado por crear aplicaciones interactivas y
               responsivas. Mi experiencia abarca JavaScript, React, MongoDB, HTML, CSS, Next.js,
-              Node.js, Express y Git. Aprendo rápido y disfruto trabajar en equipo con foco en
-              calidad y buenas prácticas.
+              Node.js, Express y Git.<br /> <br />
+              He trabajado en proyectos propios y con clientes, siempre con foco en código limpio y resultados concretos.
             </p>
             <div className="mt-8">
               <div className="flex flex-row gap-2 border-b border-surface-border pb-px">
