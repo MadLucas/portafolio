@@ -6,7 +6,7 @@ import EmailSection from "./components/EmailSection"
 
 export default function Home() {
   return (
-    <main className="relative flex min-h-screen flex-col bg-page">
+    <main className="relative flex min-h-screen flex-col overflow-x-hidden bg-page">
       <div
         className="pointer-events-none fixed inset-0 -z-10 bg-hero-glow opacity-90"
         aria-hidden

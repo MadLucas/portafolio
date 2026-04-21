@@ -12,11 +12,27 @@ const longestHeadlinePart = HEADLINE_ROTATION.reduce((a, b) => (a.length >= b.le
 
 const TYPE_SEQUENCE = [HEADLINE_ROTATION[0], 1200, HEADLINE_ROTATION[1], 1200]
 
+const HERO_VIDEO_SRC =
+  '/vecteezy_isometric-desktop-computer-coding-programming-technology_22328336.mp4'
+
 const HeroSection = () => {
   return (
-    <section className="relative pb-16 pt-4 md:pb-24">
-      <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
-        <div className="place-self-center text-center sm:text-left lg:col-span-7">
+    <section className="relative ml-[calc(50%-50vw)] w-screen max-w-[100vw] overflow-hidden pb-16 pt-4 md:pb-24">
+      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
+        <video
+          className="h-full w-full min-h-[min(100vw,520px)] object-cover object-center"
+          autoPlay
+          muted
+          loop
+          playsInline
+        >
+          <source src={HERO_VIDEO_SRC} type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/60 to-page" />
+      </div>
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
+          <div className="place-self-center text-center sm:text-left lg:col-span-7">
           <h1 className="mb-5 text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl lg:leading-[1.1]">
             <span className="relative isolate block w-full">
               {/* Capa 1: reserva exacta de espacio (invisible, no lectores de pantalla) */}
@@ -46,10 +62,9 @@ const HeroSection = () => {
               </span>
             </span>
           </h1>
-          <p className="mb-8 max-w-xl text-pretty text-base leading-relaxed text-white/85 sm:text-lg">
-          ¿Tu negocio no tiene web, o tiene una que ya no funciona?
-          Creo sitios web para negocios y profesionales. Rápidos, modernos y listos para conseguirte más clientes.{' '}
-
+          <p className="mb-8 max-w-md text-pretty text-base font-normal leading-relaxed text-white sm:text-lg">
+            ¿Tu negocio no tiene web, o tiene una que ya no funciona? Creo sitios web para negocios y
+            profesionales. Rápidos, modernos y listos para conseguirte más clientes.
           </p>
           <Link
             href="/#contacto"
@@ -57,24 +72,25 @@ const HeroSection = () => {
           >
             Contactame!
           </Link>
-        </div>
-        <div className="flex justify-center lg:col-span-5 lg:justify-end">
-          <div className="relative">
-            <div
-              className="absolute -inset-3 rounded-full bg-gradient-to-br from-accent-orange/25 via-transparent to-accent-rose/20 blur-2xl"
-              aria-hidden
-            />
-            <div className="relative flex aspect-square w-[200px] items-center justify-center rounded-full bg-surface p-1 shadow-card ring-1 ring-white/10 sm:w-[220px] lg:w-[240px]">
-              <div className="relative h-full w-full overflow-hidden rounded-full bg-[#0d1117]">
-                <Image
-                  className="object-cover object-center"
-                  src="/Lucas.jpg"
-                  alt="Lucas Fernández"
-                  width={480}
-                  height={480}
-                  sizes="(max-width: 1024px) 220px, 240px"
-                  priority
-                />
+          </div>
+          <div className="flex justify-center lg:col-span-5 lg:justify-end">
+            <div className="relative">
+              <div
+                className="absolute -inset-3 rounded-full bg-gradient-to-br from-accent-orange/25 via-transparent to-accent-rose/20 blur-2xl"
+                aria-hidden
+              />
+              <div className="relative flex aspect-square w-[200px] items-center justify-center rounded-full bg-surface p-1 shadow-card ring-1 ring-white/10 sm:w-[220px] lg:w-[240px]">
+                <div className="relative h-full w-full overflow-hidden rounded-full bg-[#0d1117]">
+                  <Image
+                    className="object-cover object-center"
+                    src="/Lucas.jpg"
+                    alt="Lucas Fernández"
+                    width={480}
+                    height={480}
+                    sizes="(max-width: 1024px) 220px, 240px"
+                    priority
+                  />
+                </div>
               </div>
             </div>
           </div>
