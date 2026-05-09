@@ -6,13 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "migrate:cloudinary:dry": "node --env-file=.env.local scripts/migrate-project-images-to-cloudinary.mjs",
+    "migrate:cloudinary": "MIGRATION_DRY_RUN=false node --env-file=.env.local scripts/migrate-project-images-to-cloudinary.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.1",
     "@vercel/analytics": "^2.0.1",
+    "cloudinary": "^2.10.0",
     "firebase": "^12.11.0",
     "firebase-admin": "^13.7.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
     "next": "14.1.0",
     "react": "^18.2.0",
     "react-dom": "^18",

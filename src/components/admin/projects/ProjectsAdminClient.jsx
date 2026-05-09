@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useCallback, useEffect, useState } from 'react'
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import {
   collection,
   deleteDoc,
@@ -224,19 +223,25 @@ const ProjectsAdminClient = () => {
     setImageUrlInput('')
   }
 
-  const uploadProjectImages = async (storage, projectId, files) => {
+  const uploadProjectImages = async (projectId, files) => {
     const urls = []
     for (const file of files) {
-      const baseName = file.name.replace(/\.[^/.]+$/, '')
-      const rawExt = file.name.includes('.') ? file.name.split('.').pop().toLowerCase() : 'jpg'
-      const ext = /^[a-z0-9]{2,5}$/.test(rawExt || '') ? rawExt : 'jpg'
-      const safe = sanitizeStorageFileName(baseName)
-      const path = `portfolio-projects/${projectId}/images/${Date.now()}_${safe}.${ext}`
-      const storageRef = ref(storage, path)
-      await uploadBytes(storageRef, file, {
-        contentType: file.type || 'image/jpeg',
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('projectId', projectId)
+
+      const res = await fetch('/api/uploads/cloudinary-image', {
+        method: 'POST',
+        body: formData,
       })
-      urls.push(await getDownloadURL(storageRef))
+
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || typeof data.url !== 'string' || !data.url.trim()) {
+        const message =
+          data?.error?.message || 'No se pudo subir una imagen a Cloudinary'
+        throw new Error(message)
+      }
+      urls.push(data.url.trim())
     }
     return urls
   }
@@ -261,10 +266,7 @@ const ProjectsAdminClient = () => {
     const db = getFirebaseFirestore()
     if (!db) return
 
-    const needsStorage =
-      pendingImageFiles.length > 0 || pendingPdfFiles.length > 0
-
-    if (needsStorage) {
+    if (pendingPdfFiles.length > 0) {
       const storage = getFirebaseStorage()
       if (!storage) {
         alert('Configura NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET en .env.local y reinicia el servidor')
@@ -284,8 +286,7 @@ const ProjectsAdminClient = () => {
       let pdfs = [...form.pdfs]
 
       if (pendingImageFiles.length > 0) {
-        if (!storage) throw new Error('Storage no disponible')
-        const uploaded = await uploadProjectImages(storage, projectRef.id, pendingImageFiles)
+        const uploaded = await uploadProjectImages(projectRef.id, pendingImageFiles)
         imageUrls = [...imageUrls, ...uploaded]
       }
 

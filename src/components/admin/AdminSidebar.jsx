@@ -9,6 +9,7 @@ import {
   DocumentTextIcon,
   ClipboardDocumentListIcon,
   CpuChipIcon,
+  BeakerIcon,
   ChevronRightIcon,
   ChevronLeftIcon,
   PowerIcon,
@@ -24,6 +25,7 @@ const items = [
   { href: '/admin/soluciones', label: 'Soluciones', Icon: CpuChipIcon },
   { href: '/admin/blog', label: 'Blog', Icon: DocumentTextIcon },
   { href: '/admin/encuestas', label: 'Encuestas', Icon: ClipboardDocumentListIcon },
+  { href: '/admin/laboratorio', label: 'Laboratorio', Icon: BeakerIcon },
 ]
 
 const AdminSidebar = ({ open, onToggle, onSignOut, userEmail }) => {
